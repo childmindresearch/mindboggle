@@ -15,7 +15,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
-      # Pinned to match the dev group in pyproject.toml.
       - run: uvx ruff@0.16.0 check .
 
   build:
@@ -36,7 +35,7 @@ jobs:
       - name: Set up Miniconda
         uses: conda-incubator/setup-miniconda@v3
         with:
-          python-version: "3.6"
+          python-version: "3.12"
           channels: conda-forge
           channel-priority: strict
           auto-activate-base: false
@@ -60,16 +59,20 @@ jobs:
         run: |
           conda install -y \
             cmake \
+            "vtk=9.3" \
+            "libboost=1.86.0" \
+            "libboost-devel=1.86.0" \
+            "libboost-headers=1.86.0" \
+            eigen \
             mesalib \
-            vtk \
             pandas \
             matplotlib \
             colormath \
             nipype \
-            tbb-devel \
             nose \
-            etelemetry
-          python -m pip install .
+            etelemetry \
+            tbb-devel
+          python -m pip install --no-build-isolation .
 
       - name: Build VTK C++ tools
         shell: bash -l {0}
