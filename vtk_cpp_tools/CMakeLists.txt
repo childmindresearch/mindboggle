@@ -1,12 +1,14 @@
 # http://www.vtk.org/Wiki/VTK/Tutorials/CMakeListsFile
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.5...4.4)
 project(mindboggle_surfaces)
+find_package(VTK REQUIRED COMPONENTS
+  CommonCore
+  CommonDataModel
+)
+
 ## Rather than set the VTK_DIR, compile with
 ## "cmake .. -DVTK_DIR:STRING=/Users/arno/anaconda/lib/cmake/vtk-7.0"
 #set(VTK_DIR "/Users/arno/anaconda/lib/cmake/vtk-7.0")
-#find_package(VTK REQUIRED NO_MODULE)
-find_package(VTK 8.1 COMPONENTS vtkInteractionStyle vtkRenderingFreeType vtkRenderingOpenGL2 vtkRenderingVolumeOpenGL2 vtkIOLegacy vtkIOMINC vtkIOGeometry vtkImagingStencil vtkImagingMorphological vtkFiltersModeling NO_MODULE)
-include(${VTK_USE_FILE})
 
 #if(COMMAND CMAKE_POLICY)
 #  CMAKE_POLICY(SET CMP0003 NEW)
@@ -46,50 +48,23 @@ geodesic_depth
 #medial_surfaces
 #)
 
-add_library(
-MeshAnalyser MeshAnalyser.cpp
-)
-install(TARGETS MeshAnalyser
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib)
+add_library(MeshAnalyser MeshAnalyser.cpp)
+target_link_libraries(MeshAnalyser PUBLIC VTK::CommonCore VTK::CommonDataModel)
 
-add_library(
-FsSurfaceReader FsSurfaceReader.cpp
-)
+add_library(FsSurfaceReader FsSurfaceReader.cpp)
+target_link_libraries(FsSurfaceReader PUBLIC VTK::CommonCore VTK::CommonDataModel)
 
-add_library(
-VtkFileEditor VtkFileEditor.cpp
-)
+add_library(VtkFileEditor VtkFileEditor.cpp)
+target_link_libraries(VtkFileEditor PUBLIC VTK::CommonCore VTK::CommonDataModel)
 
-add_library(
-TravelDepth TravelDepth.cpp
-)
+add_library(TravelDepth TravelDepth.cpp)
+target_link_libraries(TravelDepth PUBLIC VTK::CommonCore VTK::CommonDataModel)
 
-add_library(
-Overlap Overlap.cpp
-)
+add_library(GradientComputer GradientComputer.cpp)
+target_link_libraries(GradientComputer PUBLIC VTK::CommonCore VTK::CommonDataModel)
 
-add_library(
-GradientComputer GradientComputer.cpp
-)
+add_library(PointAreaComputer PointAreaComputer.cpp)
+target_link_libraries(PointAreaComputer PUBLIC VTK::CommonCore VTK::CommonDataModel)
 
-add_library(
-PointAreaComputer PointAreaComputer.cpp
-)
-
-target_link_libraries(
-MeshAnalyser
-)
-
-target_link_libraries(
-TravelDepth
-)
-
-target_link_libraries(
-GradientComputer
-)
-
-target_link_libraries(
-Overlap
-PointAreaComputer
-)
+add_library(Overlap Overlap.cpp)
+target_link_libraries(Overlap PUBLIC PointAreaComputer VTK::CommonCore VTK::CommonDataModel)

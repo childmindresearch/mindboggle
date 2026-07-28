@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.5...4.4)
 
 # Find VTK:
 find_package(VTK REQUIRED NO_MODULE)
