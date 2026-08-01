@@ -46,40 +46,47 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -yq \
             build-essential \
+            cmake \
             libgl1-mesa-dev \
             libglu1-mesa-dev \
             libsm-dev \
             libx11-dev \
             libxt-dev \
-            libxext-dev
+            libxext-dev \
+            xvfb
           sudo ln -sv /usr/lib/x86_64-linux-gnu /usr/lib64
 
       - name: Install Python and conda dependencies
         shell: bash -l {0}
         run: |
-          conda install -y \
-            cmake \
-            "vtk=9.3" \
-            "libboost=1.86.0" \
-            "libboost-devel=1.86.0" \
-            "libboost-headers=1.86.0" \
-            eigen \
+          conda install -y -n base conda-libmamba-solver
+          conda config --set solver libmamba
+          conda install -y -c conda-forge --override-channels \
+            python=3.12 \
+            vtk=9.3.* \
             mesalib \
+            numpy \
+            nibabel \
             pandas \
             matplotlib \
-            colormath \
             nipype \
             nose \
             etelemetry \
             tbb-devel
-          python -m pip install --no-build-isolation .
+          pip install colormath pytest pytest-timeout
+          python - <<'PY'
+          import numpy as np
+          if not hasattr(np, "asscalar"):
+              np.asscalar = lambda a: a.item()
+          PY
+          python -m pip install --no-build-isolation --no-deps .
 
       - name: Build VTK C++ tools
         shell: bash -l {0}
         run: |
           mkdir -p vtk_cpp_tools/bin
           cd vtk_cpp_tools/bin
-          cmake ../
+          cmake ../ -DCMAKE_PREFIX_PATH="$CONDA_PREFIX"
           make -j2
 
       - name: Run current tests
@@ -88,8 +95,4 @@ jobs:
           MB: ${{ github.workspace }}/src/mindboggle
         run: |
           export PATH="$PATH:${{ github.workspace }}/vtk_cpp_tools/bin"
-          python -m nose --with-doctest "$MB/thirdparty/"
-          python -m nose --with-doctest "$MB/mio/"
-          python -m nose --with-doctest "$MB/guts/"
-          python -m nose --with-doctest "$MB/shapes/"
-          python -m nose --with-doctest "$MB/features/"
+          xvfb-run -a python -m pytest --doctest-modules --timeout=30 -v "$MB/"

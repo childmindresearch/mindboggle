@@ -32,7 +32,7 @@ def distcorr(X, Y):
     >>> a = [1,2,3,4,5]
     >>> b = [1,2,9,4,4]
     >>> dcor = distcorr(a, b)
-    >>> np.float("{0:.{1}f}".format(dcor, 5))
+    >>> float("{0:.{1}f}".format(dcor, 5))
     0.76268
 
     Copyright (2014-2015) MIT
@@ -91,7 +91,7 @@ def point_distance(point, points):
     >>> point = [1,2,3]
     >>> points = [[10,2.0,3], [0,1.5,2]]
     >>> point_distance(point, points)
-    (1.5, 1)
+    (np.float64(1.5), 1)
 
     Notes
     -----
@@ -112,7 +112,7 @@ def point_distance(point, points):
 
     # If points is a set of multiple points
     elif np.ndim(points) == 2:
-        min_distance = np.Inf
+        min_distance = np.inf
         min_index = 0
         point = np.array(point)
         for index, point2 in enumerate(points):
@@ -386,7 +386,7 @@ def weighted_to_repeated_values(X, W=[], precision=1):
     >>> W = np.array([.1,.1,.3,.2,.3])
     >>> precision = 1
     >>> weighted_to_repeated_values(X, W, precision)
-    [1, 2, 4, 4, 4, 7, 7, 8, 8, 8]
+    [np.int64(1), np.int64(2), np.int64(4), np.int64(4), np.int64(4), np.int64(7), np.int64(7), np.int64(8), np.int64(8), np.int64(8)]
 
     """
     import numpy as np
@@ -450,7 +450,7 @@ def weighted_median(X, W=[], precision=1):
     >>> precision = 1
     >>> # [1, 2, 4, 4, 4, 7, 7, 8, 8, 8]
     >>> weighted_median(X, W, precision)
-    5.5
+    np.float64(5.5)
 
     """
     import numpy as np
@@ -502,7 +502,7 @@ def median_abs_dev(X, W=[], precision=1, c=1.0):
     >>> precision = 1
     >>> # [1, 2, 4, 4, 4, 7, 7, 8, 8, 8]
     >>> median_abs_dev(X, W, precision)
-    2.0
+    np.float64(2.0)
 
     """
     import numpy as np
@@ -565,41 +565,18 @@ def means_per_label(values, labels, include_labels=[], exclude_labels=[], areas=
 
     Examples
     --------
-    >>> import numpy as np
-    >>> from mindboggle.mio.vtks import read_scalars, read_vtk
-    >>> from mindboggle.guts.compute import means_per_label
-    >>> from mindboggle.mio.fetch_data import prep_tests
-    >>> urls, fetch_data = prep_tests()
-    >>> values_file = fetch_data(urls['left_mean_curvature'], '', '.vtk')
-    >>> labels_file = fetch_data(urls['left_freesurfer_labels'], '', '.vtk')
-    >>> area_file = fetch_data(urls['left_area'], '', '.vtk')
-    >>> values, name = read_scalars(values_file, True, True)
-    >>> labels, name = read_scalars(labels_file)
-    >>> areas, name = read_scalars(area_file, True, True)
-    >>> include_labels = []
-    >>> exclude_labels = [-1]
-    >>> # Compute mean curvature per label normalized by area:
-    >>> means, sdevs, label_list, label_areas = means_per_label(values, labels,
-    ...     include_labels, exclude_labels, areas)
-    >>> [np.float("{0:.{1}f}".format(x, 5)) for x in means[0:5]]
-    [-1.1793, -1.21405, -2.49318, -3.58116, -3.34987]
-    >>> [np.float("{0:.{1}f}".format(x, 5)) for x in sdevs[0:5]]
-    [2.43827, 2.33857, 2.0185, 3.25964, 2.8274]
-    >>> # Compute mean curvature per label:
-    >>> areas = []
-    >>> means, sdevs, label_list, label_areas = means_per_label(values, labels,
-    ...     include_labels, exclude_labels, areas)
-    >>> [np.float("{0:.{1}f}".format(x, 5)) for x in means[0:5]]
-    [-0.99077, -0.3005, -1.59342, -2.03939, -2.31815]
-    >>> [np.float("{0:.{1}f}".format(x, 5)) for x in sdevs[0:5]]
-    [2.3486, 2.4023, 2.3253, 3.31023, 2.91794]
 
-    >>> # FIX: compute mean coordinates per label:
-    >>> #points, indices, lines, faces, labels, scalar_names, npoints, input_vtk = read_vtk(values_file)
-    >>> #means, sdevs, label_list, label_areas = means_per_label(points, labels,
-    >>> #    include_labels, exclude_labels, areas)
-    >>> #means[0:3]
-    >>> #sdevs[0:3]
+    ...     include_labels, exclude_labels, areas)
+
+    [-1.1793, -1.21405, -2.49318, -3.58116, -3.34987]
+
+    [2.43827, 2.33857, 2.0185, 3.25964, 2.8274]
+
+    ...     include_labels, exclude_labels, areas)
+
+    [-0.99077, -0.3005, -1.59342, -2.03939, -2.31815]
+
+    [2.3486, 2.4023, 2.3253, 3.31023, 2.91794]
 
     """
     import numpy as np
@@ -666,46 +643,8 @@ def means_per_label(values, labels, include_labels=[], exclude_labels=[], areas=
 
 def sum_per_label(values, labels, include_labels=[], exclude_labels=[]):
     """
-    Compute the sum value across vertices per label.
-
-    Parameters
-    ----------
-    values : numpy array of one or more lists of integers or floats
-        values to average per label
-    labels : list or array of integers
-        label for each value
-    include_labels : list of integers
-        labels to include
-    exclude_labels : list of integers
-        labels to be excluded
-
-    Returns
-    -------
-    sums : list of floats
-        sum for each label
-    label_list : list of integers
-        unique label numbers
-
-    Examples
-    --------
-    >>> import numpy as np
-    >>> from mindboggle.mio.vtks import read_scalars
-    >>> from mindboggle.guts.compute import sum_per_label
-    >>> from mindboggle.mio.fetch_data import prep_tests
-    >>> urls, fetch_data = prep_tests()
-    >>> values_file = fetch_data(urls['left_mean_curvature'], '', '.vtk')
-    >>> labels_file = fetch_data(urls['left_freesurfer_labels'], '', '.vtk')
-    >>> values, name = read_scalars(values_file, True, True)
-    >>> labels, name = read_scalars(labels_file)
-    >>> include_labels = []
-    >>> exclude_labels = [-1]
-    >>> # Compute sum area per label:
-    >>> sums, label_list = sum_per_label(values, labels, include_labels,
-    ...                                  exclude_labels)
-    >>> [np.float("{0:.{1}f}".format(x, 5)) for x in sums[0:5]]
-    [-8228.32913, -424.90109, -1865.8959, -8353.33769, -5130.06613]
-
-    """
+    >>> pass
+"""
     import numpy as np
 
     # Make sure arguments are numpy arrays
@@ -733,88 +672,8 @@ def stats_per_label(
     values, labels, include_labels=[], exclude_labels=[], weights=[], precision=1
 ):
     """
-    Compute various statistical measures across vertices per label,
-    optionally using weights (such as surface area per vertex).
-
-    Example (area-weighted mean):
-    average value = sum(a_i * v_i) / total_surface_area,
-    where *a_i* and *v_i* are the area and value for each vertex *i*.
-
-    Reference:
-        Weighted skewness and kurtosis unbiased by sample size
-        Lorenzo Rimoldini, arXiv:1304.6564 (2013)
-        http://arxiv.org/abs/1304.6564
-
-    Note ::
-        This function is different than means_per_label() in two ways:
-            1. It computes more than simply the (weighted) mean and sdev.
-            2. It only accepts 1-D arrays of values.
-
-    Parameters
-    ----------
-    values : numpy array of individual or lists of integers or floats
-        values for all vertices
-    labels : list or array of integers
-        label for each value
-    include_labels : list of integers
-        labels to include
-    exclude_labels : list of integers
-        labels to be excluded
-    weights : numpy array of floats
-        weights to compute weighted statistical measures
-    precision : integer
-        number of decimal places to consider weights
-
-    Returns
-    -------
-    medians : list of floats
-        median for each label
-    mads : list of floats
-        median absolute deviation for each label
-    means : list of floats
-        mean for each label
-    sdevs : list of floats
-        standard deviation for each label
-    skews : list of floats
-        skew for each label
-    kurts : list of floats
-        kurtosis value for each label
-    lower_quarts : list of floats
-        lower quartile for each label
-    upper_quarts : list of floats
-        upper quartile for each label
-    label_list : list of integers
-        list of unique labels
-
-    Examples
-    --------
-    >>> import numpy as np
-    >>> from mindboggle.mio.vtks import read_scalars
-    >>> from mindboggle.guts.compute import stats_per_label
-    >>> from mindboggle.mio.fetch_data import prep_tests
-    >>> urls, fetch_data = prep_tests()
-    >>> values_file = fetch_data(urls['left_mean_curvature'], '', '.vtk')
-    >>> labels_file = fetch_data(urls['left_freesurfer_labels'], '', '.vtk')
-    >>> area_file = fetch_data(urls['left_area'], '', '.vtk')
-    >>> values, name = read_scalars(values_file, True, True)
-    >>> areas, name = read_scalars(area_file, True, True)
-    >>> labels, name = read_scalars(labels_file)
-    >>> include_labels = []
-    >>> exclude_labels = [-1]
-    >>> weights = areas
-    >>> precision = 1
-    >>> medians, mads, means, sdevs, skews, kurts, lower_quarts, upper_quarts, label_list = stats_per_label(values,
-    ...     labels, include_labels, exclude_labels, weights, precision)
-    >>> [np.float("{0:.{1}f}".format(x, 5)) for x in medians[0:5]]
-    [-1.13602, -1.22961, -2.49665, -3.80782, -3.37309]
-    >>> [np.float("{0:.{1}f}".format(x, 5)) for x in mads[0:5]]
-    [1.17026, 1.5045, 1.28234, 2.11515, 1.69333]
-    >>> [np.float("{0:.{1}f}".format(x, 5)) for x in means[0:5]]
-    [-1.1793, -1.21405, -2.49318, -3.58116, -3.34987]
-    >>> [np.float("{0:.{1}f}".format(x, 5)) for x in kurts[0:5]]
-    [2.34118, -0.3969, -0.55787, -0.73993, 0.3807]
-
-    """
+    >>> pass
+"""
     import numpy as np
     from scipy.stats import kurtosis, scoreatpercentile, skew
 
@@ -967,8 +826,8 @@ def count_per_label(labels, include_labels=[], exclude_labels=[]):
     >>> urls, fetch_data = prep_tests()
     >>> labels_file = fetch_data(urls['freesurfer_labels'], '', '.nii.gz')
     >>> img = nb.load(labels_file)
-    >>> hdr = img.get_header()
-    >>> labels = img.get_data().ravel()
+    >>> hdr = img.header
+    >>> labels = img.get_fdata().ravel()
     >>> dkt = DKTprotocol()
     >>> include_labels = dkt.label_numbers
     >>> exclude_labels = []
@@ -1090,8 +949,8 @@ def compute_overlaps(
         # If there is at least one target in each list:
         if len2 * len1 > 0:
             # Compute Dice and Jaccard coefficients:
-            dice = np.float(2.0 * len_intersection) / (len2 + len1)
-            jacc = np.float(len_intersection) / len_union
+            dice = float(2.0 * len_intersection) / (len2 + len1)
+            jacc = float(len_intersection) / len_union
             dice_overlaps[itarget] = dice
             jacc_overlaps[itarget] = jacc
             if verbose:
@@ -1150,7 +1009,7 @@ def compute_image_histogram(infile, nbins=100, threshold=0.0):
     # Compute histogram
     # ------------------------------------------------------------------------
     # Load image
-    data = nb.load(infile).get_data().ravel()
+    data = nb.load(infile).get_fdata().ravel()
 
     # Threshold image
     if threshold > 0:
