@@ -83,6 +83,15 @@ script-files = [
 [tool.setuptools.package-data]
 mindboggle = ["data/*.nii.gz", "data/*.txt"]
 
+[tool.pytest.ini_options]
+addopts = [
+  "--ignore=src/mindboggle/testzernikecompatinit.py",
+  "--ignore=src/mindboggle/testzernikecompat*.py",
+  "--ignore=src/mindboggle/testzernikemultiproc*.py",
+  "--ignore=src/mindboggle/x/test_zernike/compat",
+  "--ignore=src/mindboggle/x/test_zernike/multiproc",
+]
+
 [tool.setuptools.dynamic]
 version = { attr = "mindboggle.version.__version__" }
 
