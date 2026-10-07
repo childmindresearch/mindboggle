@@ -44,6 +44,8 @@ jobs:
   vtk-tools:
     name: Build VTK tools & run tests
     runs-on: ubuntu-latest
+    env:
+      MINDBOGGLE_CACHE: /home/runner/.cache/mindboggle
 
     steps:
       - uses: actions/checkout@v4
@@ -96,6 +98,12 @@ jobs:
               np.asscalar = lambda a: a.item()
           PY
           python -m pip install --no-build-isolation --no-deps .
+
+      - name: Cache Mindboggle test data
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/mindboggle
+          key: mindboggle-testdata-${{ hashFiles('src/mindboggle/mio/fetch_data.py') }}
 
       - name: Build VTK C++ tools
         shell: bash -l {0}

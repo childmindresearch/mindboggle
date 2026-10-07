@@ -98,7 +98,7 @@ def find_depth_threshold(depth_file, min_vertices=10000, verbose=False):
     # Compute histogram of depth measures:
     # ------------------------------------------------------------------------
     if npoints > min_vertices:
-        nbins = np.int(np.round(npoints / 100.0))
+        nbins = int(np.round(npoints / 100.0))
     else:
         raise OSError(
             f"  Expecting at least {min_vertices} vertices to create depth histogram"
@@ -308,7 +308,7 @@ def extract_folds(
         renumber_folds = background_value * np.ones(npoints)
         fold_numbers = [x for x in np.unique(folds) if x != background_value]
         for i_fold, n_fold in enumerate(fold_numbers):
-            fold_indices = [i for i, x in enumerate(folds) if x == n_fold]
+            fold_indices = np.where(np.asarray(folds) == n_fold)[0].tolist()
             renumber_folds[fold_indices] = i_fold
         folds = renumber_folds
         folds = [int(x) for x in folds]
